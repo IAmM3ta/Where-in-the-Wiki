@@ -58,6 +58,16 @@ Future deep learning models (graph + sequential policies) trained on this data w
 
 Open `index.html` in any modern browser. Internet required for Wikipedia content.
 
+## Dissertation
+
+The complete dissertation "From Human Trails to Human-Aligned Embeddings: Gamified Elicitation of Decision Trees on Semantic Graphs" is included in the repository:
+
+- **LaTeX source**: `docs/WOW-Dissertation.tex`
+
+It features a detailed worked example of navigating from the "Basketball" article to the "Moon landing" article. This illustrates the human decision process at each step (visible alternatives, heuristics like lead-section bias and hub exploitation, semantic priming), and shows how a single trajectory generates rich supervised training data (positive chosen links + contrastive rejected alternatives + temporal features) for training human-aligned goal-conditioned policies and embeddings.
+
+The compiled PDF provides the full formatted academic presentation.
+
 ## Full System Vision & Roadmap
 
 ### Phase 1 (Current)
@@ -92,6 +102,8 @@ Prototype + local data export. Validate UX and logging fidelity.
 Where-in-the-Wiki/
 ├── index.html          # Playable prototype + data exporter
 ├── README.md
+├── docs/
+│   └── WOW-Dissertation.tex  # Full dissertation source (with Basketball → Moon landing example)
 └── (future) backend/   # FastAPI + DB migrations, websocket handlers
 ```
 
