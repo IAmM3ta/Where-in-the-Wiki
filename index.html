@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Where in the Wiki • Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
+        :root { --accent: #3b82f6; }
+        body { font-family: 'Inter', system_ui, sans-serif; }
+        .font-display { font-family: 'Space Grotesk', 'Inter', sans-serif; }
+        .wiki-content { 
+            font-family: 'Inter', system_ui, sans-serif; 
+            line-height: 1.7; 
+            color: #e4e4e7;
+        }
+        .wiki-content h2, .wiki-content h3 { 
+            font-family: 'Space Grotesk', sans-serif; 
+            font-weight: 600; 
+            color: #f4f4f5; 
+            margin-top: 1.5rem; 
+            margin-bottom: 0.75rem; 
+            border-bottom: 1px solid #27272a; 
+            padding-bottom: 0.25rem;
+        }
+        .wiki-content p { margin-bottom: 1rem; }
+        .wiki-content a { 
+            color: #60a5fa; 
+            text-decoration: underline; 
+            text-underline-offset: 2px;
+        }
+        .wiki-content a:hover { 
+            color: #93c5fd; 
+            text-decoration: underline;
+        }
+        .wiki-content ul, .wiki-content ol { margin-left: 1.25rem; margin-bottom: 1rem; }
+        .wiki-content li { margin-bottom: 0.25rem; }
+        .wiki-content .infobox, .wiki-content .navbox, 
+        .wiki-content .mw-references-wrap, .wiki-content .reflist,
+        .wiki-content .hatnote, .wiki-content .ambox,
+        .wiki-content .metadata, .wiki-content .noprint,
+        .wiki-content sup.reference, .wiki-content .reference { 
+            display: none !important; 
+        }
+        .wiki-content img { 
+            max-width: 260px; 
+            height: auto; 
+            border-radius: 6px; 
+            margin: 0.5rem 0;
+            box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+        }
+        .path-badge { 
+            transition: all 0.1s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .path-badge:hover { 
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .status-value { font-variant-numeric: tabular-nums; }
+        .section-header { 
+            font-size: 0.75rem; 
+            letter-spacing: 0.5px; 
+            text-transform: uppercase; 
+            font-weight: 600; 
+            color: #71717a;
+        }
+        .game-card { 
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .metric { 
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200">
+    <!-- Header -->
+    <header class="border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-x-3">
+                <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-link text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-display text-2xl font-semibold tracking-tighter">Where in the Wiki</h1>
+                    <p class="text-[10px] text-zinc-500 -mt-1">RACE • RECORD • ANALYZE</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-x-4 text-sm">
+                <div class="px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full text-xs flex items-center gap-x-2">
+                    <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <span class="text-zinc-400">Prototype v0.1 • Path Logging Active</span>
+                </div>
+                <a href="https://github.com/IAmM3ta/Where-in-the-Wiki" target="_blank" 
+                   class="text-zinc-400 hover:text-zinc-200 transition-colors flex items-center gap-x-1.5 text-xs">
+                    <i class="fa-brands fa-github"></i>
+                    <span>GitHub</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-6 pt-8 pb-16">
+        
+        <!-- Intro / Vision -->
+        <div class="max-w-3xl mb-10">
+            <div class="inline-flex items-center gap-x-2 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-full text-xs mb-4">
+                <span class="text-emerald-400">DATA FOR HUMAN-ALIGNED AI</span>
+            </div>
+            <h2 class="font-display text-4xl font-semibold tracking-tighter leading-none mb-3">Wikipedia racing.<br>Human decision traces.<br>Training data for minds that navigate like us.</h2>
+            <p class="text-zinc-400 text-[15px] max-w-md">A clean prototype for capturing how humans perform goal-directed search across one of the largest semantic graphs ever constructed. Every path logged is raw material for models that reason more like humans.</p>
+        </div>
+
+        <!-- Category Selection -->
+        <div id="category-section">
+            <div class="flex items-end justify-between mb-4">
+                <div>
+                    <div class="section-header mb-1">Select Category</div>
+                    <div class="text-sm text-zinc-400">Both players will receive identical Start + Target articles from this domain</div>
+                </div>
+                <button onclick="pickRandomCategory()" 
+                        class="text-xs px-3 py-1.5 border border-zinc-700 hover:bg-zinc-900 transition-colors rounded-lg flex items-center gap-x-2">
+                    <i class="fa-solid fa-dice"></i>
+                    <span>Random Category</span>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3" id="category-buttons">
+                <!-- Populated by JS -->
+            </div>
+            
+            <div class="mt-6 flex justify-center">
+                <button id="start-btn"
+                        onclick="startGame()"
+                        disabled
+                        class="px-8 py-3.5 bg-blue-600 hover:bg-blue-500 disabled:bg-zinc-800 disabled:text-zinc-500 transition-all font-semibold rounded-2xl text-sm flex items-center justify-center gap-x-3 min-w-[220px] active:scale-[0.985]">
+                    <i class="fa-solid fa-play mr-2"></i>
+                    <span>START RACE</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Interface -->
+        <div id="game-section" class="hidden mt-8">
+            <div class="flex flex-col lg:flex-row gap-6">
+                
+                <!-- Status + Controls -->
+                <div class="lg:w-80 flex-shrink-0">
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 game-card sticky top-24">
+                        
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <div class="section-header">CURRENT RACE</div>
+                                <div id="category-display" class="font-semibold text-lg"></div>
+                            </div>
+                            <button onclick="endGameEarly()" 
+                                    class="text-xs px-2.5 py-1 bg-zinc-800 hover:bg-red-950/50 text-red-400 rounded-lg flex items-center gap-x-1 transition-colors">
+                                <i class="fa-solid fa-times text-xs"></i>
+                                <span class="hidden sm:inline">Abort</span>
+                            </button>
+                        </div>
+
+                        <!-- Start / Target -->
+                        <div class="space-y-3 mb-5">
+                            <div>
+                                <div class="text-[10px] text-zinc-500 mb-1 flex items-center gap-x-1.5">
+                                    <i class="fa-solid fa-play text-emerald-500"></i> 
+                                    <span>START</span>
+                                </div>
+                                <div id="start-title" 
+                                     class="font-medium text-sm px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-xl cursor-pointer hover:border-zinc-700 transition-colors"
+                                     onclick="openWikiInNewTab(this.dataset.title)"></div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-zinc-500 mb-1 flex items-center gap-x-1.5">
+                                    <i class="fa-solid fa-flag-checkered text-amber-500"></i> 
+                                    <span>TARGET</span>
+                                </div>
+                                <div id="target-title" 
+                                     class="font-medium text-sm px-3 py-2 bg-zinc-950 border border-amber-900/50 rounded-xl cursor-pointer hover:border-amber-800 transition-colors"
+                                     onclick="openWikiInNewTab(this.dataset.title)"></div>
+                            </div>
+                        </div>
+
+                        <!-- Metrics -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-3">
+                                <div class="text-[10px] text-zinc-500">CLICKS</div>
+                                <div id="clicks-count" class="metric text-4xl font-semibold tabular-nums tracking-tighter">0</div>
+                                <div class="text-[10px] text-emerald-400/70">primary metric</div>
+                            </div>
+                            <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-3">
+                                <div class="text-[10px] text-zinc-500">TIME</div>
+                                <div id="timer-display" class="metric text-4xl font-semibold tabular-nums tracking-tighter font-mono">00:00</div>
+                                <div class="text-[10px] text-amber-400/70">secondary</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-zinc-800">
+                            <button onclick="exportSessionData()" 
+                                    class="w-full text-xs py-2.5 border border-zinc-700 hover:bg-zinc-950 transition-colors rounded-2xl flex items-center justify-center gap-x-2">
+                                <i class="fa-solid fa-download"></i>
+                                <span>Export Path JSON</span>
+                            </button>
+                            <p class="text-center text-[10px] text-zinc-500 mt-2">Data ready for ML training</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Article Viewer -->
+                <div class="flex-1 min-w-0">
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden game-card">
+                        
+                        <!-- Article Header -->
+                        <div class="px-6 pt-5 pb-4 border-b border-zinc-800 flex items-center justify-between bg-zinc-950">
+                            <div class="flex items-center gap-x-3">
+                                <div class="w-8 h-8 bg-zinc-800 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-book text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-zinc-500">NOW READING</div>
+                                    <div id="current-title" class="font-semibold text-xl tracking-tight cursor-pointer hover:text-blue-400 transition-colors" 
+                                         onclick="openWikiInNewTab(this.dataset.title)"></div>
+                                </div>
+                            </div>
+                            <div class="text-xs px-2.5 py-1 bg-zinc-800 rounded-full text-zinc-400 flex items-center gap-x-1">
+                                <i class="fa-solid fa-wikipedia-w text-[10px]"></i>
+                                <span>en.wikipedia.org</span>
+                            </div>
+                        </div>
+
+                        <!-- Wiki Content -->
+                        <div id="wiki-content" 
+                             class="wiki-content p-6 max-h-[620px] overflow-y-auto text-[15px] leading-relaxed bg-zinc-950">
+                            <!-- Populated dynamically via Wikipedia Parse API -->
+                        </div>
+
+                        <div class="px-6 py-3 bg-zinc-950 border-t border-zinc-800 text-xs text-zinc-500 flex items-center justify-between">
+                            <div>Only body links advance the race. Special pages &amp; red links are ignored.</div>
+                            <div id="path-length" class="font-mono text-[10px]"></div>
+                        </div>
+                    </div>
+
+                    <!-- Path History -->
+                    <div class="mt-4 bg-zinc-900 border border-zinc-800 rounded-3xl p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="section-header">YOUR PATH (recorded for analysis)</div>
+                            <div id="path-count" class="text-xs px-2 py-0.5 bg-zinc-800 rounded text-zinc-400 font-mono">0 hops</div>
+                        </div>
+                        <div id="path-list" class="flex flex-wrap gap-1.5 min-h-[42px]">
+                            <!-- JS populated path badges -->
+                        </div>
+                        <p class="text-[10px] text-zinc-500 mt-3">Each badge = one decision point. Timestamps &amp; click counts captured for decision-tree modeling.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="hidden mt-8 max-w-3xl mx-auto">
+            <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 game-card">
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl mb-4">
+                        <i class="fa-solid fa-tachometer-alt text-3xl"></i>
+                    </div>
+                    <h3 class="font-display text-3xl font-semibold tracking-tight">Race Complete</h3>
+                    <p class="text-zinc-400 mt-1">Trajectory captured. Ready for model training.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 text-center">
+                        <div class="text-xs text-zinc-500 mb-1">YOUR CLICKS</div>
+                        <div id="final-clicks" class="metric text-5xl font-semibold tracking-tighter"></div>
+                        <div class="text-emerald-400 text-xs mt-1">PRIMARY</div>
+                    </div>
+                    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 text-center">
+                        <div class="text-xs text-zinc-500 mb-1">TIME ELAPSED</div>
+                        <div id="final-time" class="metric text-5xl font-semibold tracking-tighter font-mono"></div>
+                        <div class="text-amber-400 text-xs mt-1">SECONDARY</div>
+                    </div>
+                    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 text-center">
+                        <div class="text-xs text-zinc-500 mb-1">COMPOSITE SCORE</div>
+                        <div id="final-score" class="metric text-5xl font-semibold tracking-tighter"></div>
+                        <div class="text-xs text-zinc-400 mt-1">lower = better</div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <div class="section-header mb-2">SIMULATED OPPONENT (for reference)</div>
+                    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 flex items-center justify-between text-sm">
+                        <div>
+                            <span class="text-zinc-400">Opponent score:</span> 
+                            <span id="opponent-score" class="font-mono font-semibold"></span>
+                        </div>
+                        <div id="win-status" class="px-4 py-1 rounded-full text-xs font-medium"></div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <div class="section-header mb-2">PATH TAKEN</div>
+                    <div id="final-path-list" class="flex flex-wrap gap-1.5 text-xs"></div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button onclick="exportSessionData()" 
+                            class="flex-1 py-3 bg-blue-600 hover:bg-blue-500 transition-colors rounded-2xl font-semibold text-sm flex items-center justify-center gap-x-2">
+                        <i class="fa-solid fa-file-export"></i>
+                        <span>EXPORT FULL SESSION JSON</span>
+                    </button>
+                    <button onclick="resetToCategorySelect()" 
+                            class="flex-1 py-3 border border-zinc-700 hover:bg-zinc-900 transition-colors rounded-2xl font-semibold text-sm flex items-center justify-center gap-x-2">
+                        <i class="fa-solid fa-redo"></i>
+                        <span>NEW RACE</span>
+                    </button>
+                </div>
+
+                <div class="mt-6 text-center">
+                    <p class="text-[10px] text-zinc-500 max-w-md mx-auto">This JSON contains the complete decision trace. Aggregate many sessions to train goal-conditioned navigation policies that emulate human multi-hop reasoning strategies.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="border-t border-zinc-800 py-6 text-xs text-zinc-500">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-y-2">
+            <div>Prototype built for human decision-tree capture • Future: validated multiplayer + ML pipeline</div>
+            <div class="flex items-center gap-x-4">
+                <span>Scoring: clicks × 10k + seconds</span>
+                <span class="hidden md:inline">•</span>
+                <span onclick="showInfoModal()" class="cursor-pointer hover:text-zinc-300 transition-colors">How paths become training data</span>
+            </div>
+        </footer>
+
+    <script>
+        // Tailwind script
+        function initTailwind() {
+            document.documentElement.style.setProperty('--accent', '#3b82f6');
+        }
+
+        // Category pools - high quality, real Wikipedia titles
+        const categoryPools = {
+            "General Knowledge": ["Philosophy", "Art", "Literature", "Music", "Film", "Psychology", "Sociology", "Geography", "Politics", "Religion"],
+            "Science": ["Physics", "Biology", "Chemistry", "Astronomy", "Mathematics", "Quantum mechanics", "Evolution", "Neuroscience", "Climate change", "Gene editing"],
+            "History": ["World War II", "Ancient Rome", "French Revolution", "Renaissance", "Industrial Revolution", "Cold War", "Pyramids of Giza", "Alexander the Great", "American Civil War", "Silk Road"],
+            "Technology": ["Internet", "Artificial intelligence", "Computer", "Smartphone", "Blockchain", "Quantum computing", "Machine learning", "Electric car", "Space exploration", "3D printing"],
+            "Sports": ["Association football", "Basketball", "Tennis", "Cricket", "Baseball", "Formula One", "Swimming", "Athletics", "Cycling", "Chess"],
+            "Business": ["Economics", "Stock market", "Entrepreneurship", "Amazon (company)", "Tesla, Inc.", "Bitcoin", "Venture capital", "Marketing", "Supply chain", "Leadership"]
+        };
+
+        let selectedCategory = null;
+        let startTitle = "";
+        let targetTitle = "";
+        let currentTitle = "";
+        let clicks = 0;
+        let startTime = 0;
+        let timerInterval = null;
+        let pathLog = [];
+        let isGameActive = false;
+        let currentCategoryName = "";
+
+        function normalizeTitle(title) {
+            return title.replace(/_/g, ' ').trim();
+        }
+
+        function calculateScore(clicksCount, timeMs) {
+            return (clicksCount * 10000) + Math.floor(timeMs / 1000);
+        }
+
+        function updateTimerDisplay() {
+            if (!startTime) return;
+            const elapsed = Date.now() - startTime;
+            const minutes = Math.floor(elapsed / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            const display = document.getElementById('timer-display');
+            if (display) display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimerDisplay, 1000);
+            updateTimerDisplay();
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function updatePathDisplay() {
+            const container = document.getElementById('path-list');
+            const countEl = document.getElementById('path-count');
+            if (!container || !countEl) return;
+
+            container.innerHTML = '';
+            pathLog.forEach((step, idx) => {
+                const badge = document.createElement('div');
+                badge.className = `path-badge px-3 py-1 text-xs rounded-2xl border flex items-center gap-x-1.5 ${idx === pathLog.length - 1 ? 'bg-blue-600/10 border-blue-600/60 text-blue-300' : 'bg-zinc-800 border-zinc-700 text-zinc-300'}`;
+                
+                const timeStr = step.timeMs > 0 ? `${(step.timeMs / 1000).toFixed(0)}s` : 'start';
+                badge.innerHTML = `
+                    <span class="font-mono text-[10px] opacity-60">${step.clicks}</span>
+                    <span class="font-medium truncate max-w-[140px]">${step.title}</span>
+                    <span class="font-mono text-[10px] opacity-50">${timeStr}</span>
+                `;
+                container.appendChild(badge);
+            });
+
+            countEl.textContent = `${pathLog.length - 1} hops`;
+            const pathLenEl = document.getElementById('path-length');
+            if (pathLenEl) pathLenEl.textContent = `${pathLog.length} steps`;
+        }
+
+        function recordPathStep() {
+            if (!currentTitle || !isGameActive) return;
+            const elapsed = startTime ? Date.now() - startTime : 0;
+            pathLog.push({
+                step: pathLog.length,
+                title: currentTitle,
+                timeMs: elapsed,
+                clicks: clicks
+            });
+            updatePathDisplay();
+        }
+
+        function updateStatus() {
+            const catEl = document.getElementById('category-display');
+            const startEl = document.getElementById('start-title');
+            const targetEl = document.getElementById('target-title');
+            const clicksEl = document.getElementById('clicks-count');
+
+            if (catEl) catEl.textContent = currentCategoryName;
+            if (startEl) {
+                startEl.textContent = startTitle;
+                startEl.dataset.title = startTitle;
+            }
+            if (targetEl) {
+                targetEl.textContent = targetTitle;
+                targetEl.dataset.title = targetTitle;
+            }
+            if (clicksEl) clicksEl.textContent = clicks;
+        }
+
+        function attachWikiLinkListeners(container) {
+            if (!container) return;
+            const links = container.querySelectorAll('a[href^="/wiki/"]');
+            
+            links.forEach(a => {
+                // Remove previous listeners by cloning (simple way)
+                const newA = a.cloneNode(true);
+                a.parentNode.replaceChild(newA, a);
+                
+                newA.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (!isGameActive) return;
+
+                    let linkTitle = newA.getAttribute('title');
+                    if (!linkTitle) {
+                        const href = newA.getAttribute('href');
+                        const match = href.match(/\/wiki\/([^#?]+)/);
+                        if (match) {
+                            linkTitle = decodeURIComponent(match[1].replace(/_/g, ' '));
+                        }
+                    }
+
+                    if (!linkTitle) return;
+
+                    // Filter special namespaces roughly
+                    if (linkTitle.includes(':') || newA.classList.contains('new')) {
+                        // Allow opening special pages in new tab instead of advancing game
+                        window.open(`https://en.wikipedia.org/wiki/${encodeURIComponent(linkTitle)}`, '_blank');
+                        return;
+                    }
+
+                    // Valid navigation
+                    clicks++;
+                    const clicksEl = document.getElementById('clicks-count');
+                    if (clicksEl) clicksEl.textContent = clicks;
+
+                    loadArticle(linkTitle);
+                });
+            });
+        }
+
+        function cleanupWikiContent(container) {
+            if (!container) return;
+            // Remove heavy / non-navigational elements
+            const toRemove = [
+                '.navbox', '.vertical-navbox', '.infobox', '.infobox_v2',
+                '.mw-references-wrap', '.reflist', '.references',
+                '.hatnote', '.ambox', '.messagebox', '.metadata',
+                '.noprint', '.mw-editsection', '.mw-jump-link',
+                '.catlinks', '.printfooter', 'sup.reference',
+                '.reference', 'style', 'script', '.sister-wiki',
+                '.mw-parser-output > .mw-empty-elt'
+            ];
+            toRemove.forEach(selector => {
+                container.querySelectorAll(selector).forEach(el => el.remove());
+            });
+
+            // Light image styling (keep a few for immersion, limit size)
+            container.querySelectorAll('img').forEach(img => {
+                img.style.maxWidth = '240px';
+                img.style.height = 'auto';
+                img.style.margin = '0.75rem 0';
+                if (img.parentElement && img.parentElement.tagName === 'A') {
+                    // keep linked images but small
+                }
+            });
+
+            // Ensure paragraphs have breathing room
+            container.querySelectorAll('p').forEach(p => {
+                if (p.textContent.trim().length < 20) p.style.marginBottom = '0.5rem';
+            });
+        }
+
+        async function loadArticle(title) {
+            const contentDiv = document.getElementById('wiki-content');
+            if (!contentDiv) return;
+
+            contentDiv.innerHTML = `
+                <div class="flex items-center justify-center py-12">
+                    <div class="flex flex-col items-center gap-y-3">
+                        <i class="fa-solid fa-spinner fa-spin text-blue-500 text-2xl"></i>
+                        <div class="text-xs text-zinc-400">Loading ${title}...</div>
+                    </div>
+                </div>
+            `;
+
+            try {
+                const apiUrl = `https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(title)}&format=json&prop=text&redirects=1&disabletoc=1&disableeditsection=1&origin=*`;
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.error || !data.parse || !data.parse.text) {
+                    contentDiv.innerHTML = `<div class="p-8 text-center text-red-400">Error loading article. <br><span class="text-xs">${data.error ? data.error.info : 'Unknown error'}</span><br><button onclick="loadArticle('${title}')" class="mt-3 text-xs underline">Retry</button></div>`;
+                    return;
+                }
+
+                const htmlContent = data.parse.text['*'];
+                contentDiv.innerHTML = htmlContent;
+
+                // Update current title from canonical returned value
+                currentTitle = data.parse.title || title;
+
+                // Cleanup
+                cleanupWikiContent(contentDiv);
+
+                // Update header
+                const currentTitleEl = document.getElementById('current-title');
+                if (currentTitleEl) {
+                    currentTitleEl.textContent = currentTitle;
+                    currentTitleEl.dataset.title = currentTitle;
+                }
+
+                // Attach interactive links
+                attachWikiLinkListeners(contentDiv);
+
+                // Record this step (initial load already recorded separately)
+                if (isGameActive && clicks >= 0) {
+                    // Only push if not duplicate of last
+                    const last = pathLog.length > 0 ? pathLog[pathLog.length-1].title : null;
+                    if (normalizeTitle(currentTitle) !== normalizeTitle(last)) {
+                        recordPathStep();
+                    }
+                }
+
+                // Check win condition
+                checkWinCondition();
+
+            } catch (err) {
+                console.error(err);
+                contentDiv.innerHTML = `<div class="p-8 text-center text-red-400">Network or parsing error.<br><button onclick="loadArticle('${title}')" class="mt-3 text-xs underline">Retry</button></div>`;
+            }
+        }
+
+        function checkWinCondition() {
+            if (!isGameActive || !currentTitle || !targetTitle) return;
+            if (normalizeTitle(currentTitle) === normalizeTitle(targetTitle)) {
+                // Win!
+                setTimeout(() => {
+                    if (isGameActive) endGame();
+                }, 420);
+            }
+        }
+
+        function pickStartAndTarget(category) {
+            const pool = categoryPools[category] || categoryPools["General Knowledge"];
+            let startIdx = Math.floor(Math.random() * pool.length);
+            let targetIdx;
+            do {
+                targetIdx = Math.floor(Math.random() * pool.length);
+            } while (targetIdx === startIdx);
+            return {
+                start: pool[startIdx],
+                target: pool[targetIdx]
+            };
+        }
+
+        function selectCategory(category) {
+            selectedCategory = category;
+            currentCategoryName = category;
+
+            // Visual feedback
+            document.querySelectorAll('#category-buttons button').forEach(btn => {
+                if (btn.dataset.category === category) {
+                    btn.classList.add('!bg-blue-600', '!border-blue-500', 'text-white', 'shadow-inner');
+                    btn.classList.remove('border-zinc-700', 'hover:bg-zinc-800');
+                } else {
+                    btn.classList.remove('!bg-blue-600', '!border-blue-500', 'text-white', 'shadow-inner');
+                    btn.classList.add('border-zinc-700', 'hover:bg-zinc-800');
+                }
+            });
+
+            const startBtn = document.getElementById('start-btn');
+            if (startBtn) startBtn.disabled = false;
+        }
+
+        function pickRandomCategory() {
+            const cats = Object.keys(categoryPools);
+            const randomCat = cats[Math.floor(Math.random() * cats.length)];
+            selectCategory(randomCat);
+        }
+
+        function initCategoryButtons() {
+            const container = document.getElementById('category-buttons');
+            if (!container) return;
+            container.innerHTML = '';
+
+            Object.keys(categoryPools).forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = `px-4 py-3 text-sm border border-zinc-700 hover:bg-zinc-800 active:bg-zinc-900 transition-all rounded-2xl text-left flex flex-col items-start justify-center gap-y-0.5`;
+                btn.dataset.category = cat;
+                btn.innerHTML = `
+                    <span class="font-semibold">${cat}</span>
+                    <span class="text-[10px] text-zinc-400">${categoryPools[cat].length} articles</span>
+                `;
+                btn.onclick = () => selectCategory(cat);
+                container.appendChild(btn);
+            });
+        }
+
+        async function startGame() {
+            if (!selectedCategory) {
+                alert('Please select a category first');
+                return;
+            }
+
+            const picked = pickStartAndTarget(selectedCategory);
+            startTitle = picked.start;
+            targetTitle = picked.target;
+            currentTitle = startTitle;
+            clicks = 0;
+            pathLog = [];
+            isGameActive = true;
+
+            // Hide category, show game
+            document.getElementById('category-section').classList.add('hidden');
+            document.getElementById('game-section').classList.remove('hidden');
+            document.getElementById('results-section').classList.add('hidden');
+
+            // Reset UI
+            document.getElementById('clicks-count').textContent = '0';
+            document.getElementById('timer-display').textContent = '00:00';
+            document.getElementById('wiki-content').innerHTML = '';
+            document.getElementById('path-list').innerHTML = '';
+            document.getElementById('path-count').textContent = '0 hops';
+
+            updateStatus();
+            startTimer();
+
+            // Load starting article
+            await loadArticle(startTitle);
+
+            // Record initial step after load
+            pathLog = [{
+                step: 0,
+                title: currentTitle,
+                timeMs: 0,
+                clicks: 0
+            }];
+            updatePathDisplay();
+
+            // Focus content area
+            setTimeout(() => {
+                const content = document.getElementById('wiki-content');
+                if (content) content.scrollTop = 0;
+            }, 100);
+        }
+
+        function endGame() {
+            if (!isGameActive) return;
+            isGameActive = false;
+            stopTimer();
+
+            const elapsed = startTime ? Date.now() - startTime : 0;
+            const score = calculateScore(clicks, elapsed);
+
+            // Hide game, show results
+            document.getElementById('game-section').classList.add('hidden');
+            const results = document.getElementById('results-section');
+            results.classList.remove('hidden');
+
+            // Populate results
+            document.getElementById('final-clicks').textContent = clicks;
+            document.getElementById('final-time').textContent = 
+                `${Math.floor(elapsed / 60000).toString().padStart(2,'0')}:${Math.floor((elapsed % 60000)/1000).toString().padStart(2,'0')}`;
+            document.getElementById('final-score').textContent = score.toLocaleString();
+
+            // Simulated opponent (variance for demo)
+            const opponentClicks = Math.max(3, clicks + Math.floor(Math.random() * 7) - 3);
+            const opponentTime = elapsed + (Math.random() - 0.5) * 180000;
+            const opponentScore = calculateScore(opponentClicks, Math.max(30000, opponentTime));
+            document.getElementById('opponent-score').textContent = opponentScore.toLocaleString();
+
+            const winEl = document.getElementById('win-status');
+            if (score < opponentScore) {
+                winEl.innerHTML = `<span class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full">YOU WIN</span>`;
+                winEl.className = 'px-4 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400';
+            } else if (score > opponentScore) {
+                winEl.innerHTML = `<span class="bg-amber-500/10 text-amber-400 px-3 py-1 rounded-full">OPPONENT WINS</span>`;
+                winEl.className = 'px-4 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400';
+            } else {
+                winEl.innerHTML = `<span class="bg-zinc-500/10 text-zinc-400 px-3 py-1 rounded-full">TIE</span>`;
+                winEl.className = 'px-4 py-1 rounded-full text-xs font-medium bg-zinc-500/10 text-zinc-400';
+            }
+
+            // Final path
+            const finalPathContainer = document.getElementById('final-path-list');
+            finalPathContainer.innerHTML = '';
+            pathLog.forEach((step, i) => {
+                const span = document.createElement('span');
+                span.className = `px-2.5 py-1 rounded-2xl text-xs border ${i === pathLog.length-1 ? 'bg-emerald-600/10 border-emerald-600/40 text-emerald-300' : 'bg-zinc-800 border-zinc-700 text-zinc-300'}`;
+                span.textContent = step.title.length > 22 ? step.title.substring(0,20) + '…' : step.title;
+                finalPathContainer.appendChild(span);
+            });
+
+            // Store last session for export
+            window.lastSessionData = {
+                sessionId: 'witw_' + Date.now(),
+                timestamp: new Date().toISOString(),
+                category: currentCategoryName,
+                startTitle: startTitle,
+                targetTitle: targetTitle,
+                totalClicks: clicks,
+                totalTimeMs: elapsed,
+                score: score,
+                path: pathLog,
+                winner: score < opponentScore ? 'player' : (score > opponentScore ? 'opponent' : 'tie'),
+                opponentScore: opponentScore,
+                notes: "Prototype session. Full backend will include validated trajectories and user attribution."
+            };
+        }
+
+        function endGameEarly() {
+            if (!isGameActive) return;
+            if (!confirm('Abort this race? Path data will still be exportable.')) return;
+            isGameActive = false;
+            stopTimer();
+            document.getElementById('game-section').classList.add('hidden');
+            document.getElementById('category-section').classList.remove('hidden');
+            // Keep last pathLog for possible export if wanted, but reset mostly
+            pathLog = [];
+        }
+
+        function exportSessionData() {
+            let data = window.lastSessionData;
+            if (!data && pathLog.length > 0) {
+                // Fallback: construct from current state (mid-game or early end)
+                const elapsed = startTime ? Date.now() - startTime : 0;
+                data = {
+                    sessionId: 'witw_' + Date.now(),
+                    timestamp: new Date().toISOString(),
+                    category: currentCategoryName || selectedCategory,
+                    startTitle: startTitle,
+                    targetTitle: targetTitle,
+                    totalClicks: clicks,
+                    totalTimeMs: elapsed,
+                    score: calculateScore(clicks, elapsed),
+                    path: pathLog,
+                    winner: null,
+                    notes: "Incomplete or aborted session from prototype."
+                };
+            }
+            if (!data) {
+                alert('No session data available yet. Complete or play a race first.');
+                return;
+            }
+
+            const jsonStr = JSON.stringify(data, null, 2);
+            
+            // Clipboard
+            navigator.clipboard.writeText(jsonStr).then(() => {
+                // Success toast
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700 text-xs px-4 py-2 rounded-2xl flex items-center gap-x-2 z-[100]';
+                toast.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i> <span>Copied to clipboard. Ready for training data pipeline.</span>`;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 2400);
+            }).catch(() => {
+                // Fallback prompt
+                prompt('Copy this JSON for your ML dataset:', jsonStr);
+            });
+
+            // Download file
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `where-in-the-wiki_${data.category.replace(/\s+/g,'-')}_${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function resetToCategorySelect() {
+            // Full reset
+            document.getElementById('results-section').classList.add('hidden');
+            document.getElementById('game-section').classList.add('hidden');
+            document.getElementById('category-section').classList.remove('hidden');
+
+            // Clear selections
+            document.querySelectorAll('#category-buttons button').forEach(b => b.classList.remove('!bg-blue-600', '!border-blue-500', 'text-white'));
+            selectedCategory = null;
+            const startBtn = document.getElementById('start-btn');
+            if (startBtn) startBtn.disabled = true;
+
+            // Clear any lingering state
+            pathLog = [];
+            window.lastSessionData = null;
+            if (timerInterval) clearInterval(timerInterval);
+        }
+
+        function openWikiInNewTab(title) {
+            if (!title) return;
+            window.open(`https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`, '_blank');
+        }
+
+        function showInfoModal() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-[200] p-6';
+            modal.innerHTML = `
+                <div class="bg-zinc-900 border border-zinc-700 rounded-3xl max-w-lg w-full p-7 text-sm">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="font-semibold text-lg">How your paths train future models</div>
+                        <button onclick="this.closest('.fixed').remove()" class="text-zinc-400 hover:text-white">✕</button>
+                    </div>
+                    <div class="space-y-4 text-zinc-300 text-[13px] leading-relaxed">
+                        <p>Every time you choose a link, you reveal a human heuristic: semantic similarity, positional bias (lead vs body), hub preference, or pragmatic "this feels closer to the goal" judgment.</p>
+                        <p>The exported JSON turns these micro-decisions into supervised training examples for goal-conditioned policies. A model trained on thousands of such traces learns to propose next steps that feel natural to humans while still progressing toward the target.</p>
+                        <p class="text-xs text-zinc-400 pt-2 border-t border-zinc-700">This is the difference between generic shortest-path algorithms and agents that navigate knowledge the way researchers, students, and curious minds actually do.</p>
+                    </div>
+                    <div class="mt-6 text-right">
+                        <button onclick="this.closest('.fixed').remove()" class="text-xs px-5 py-2 bg-zinc-800 rounded-2xl">Close</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Keyboard support (Escape aborts)
+        function initKeyboard() {
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && isGameActive) {
+                    endGameEarly();
+                }
+                if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && !isGameActive && selectedCategory) {
+                    startGame();
+                }
+            });
+        }
+
+        // Bootstrap
+        function bootstrap() {
+            initTailwind();
+            initCategoryButtons();
+            initKeyboard();
+
+            // Default select first category for convenience
+            setTimeout(() => {
+                const firstBtn = document.querySelector('#category-buttons button');
+                if (firstBtn) {
+                    // Do not auto-select to force intentional choice
+                    // firstBtn.click();
+                }
+            }, 300);
+
+            // Easter egg / dev note
+            console.log('%c[Where in the Wiki] Prototype ready. Paths logged client-side. Export JSON for ML dataset construction.', 'color:#3f3f46');
+        }
+
+        window.onload = bootstrap;
+    </script>
+</body>
+</html>
