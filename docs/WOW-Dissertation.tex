@@ -91,6 +91,8 @@ Now descend to the forest floor. Here the same terrain is experienced by countle
 
 The central conjecture of this dissertation is that these two networks—the engineered highway and the worn deer trails—represent genuinely distinct solutions to the same navigation problem, and that modern machine-learning systems, trained overwhelmingly on highway-style objectives, systematically underperform on tasks whose success ultimately depends on alignment with deer-trail cognition.
 
+To the optimization engineer, the mountain ridge is merely a calculation of elevation and distance, quickly solved by a tunnel or a straight paved grade. But to the living forager, the ridge possesses *friction*—the biting wind, the physical exposure, and the cognitive load of a steep climb. The algorithm bulldozes the terrain; the human negotiates with it. When we observe a human clicking through a Wikipedia article, we are watching this negotiation in real-time. A mathematically short link buried in a dense, unreadable paragraph carries high ``cognitive friction,'' prompting the human to instead take a longer, but smoother, path through a well-structured hub page.
+
 \section{From Metaphor to Formal Distinction}
 
 Let \(G = (V, E)\) be a directed graph whose vertices \(V\) are articles and whose edges \(E\) are hyperlinks. A navigation instance is a pair \((s, g)\) with \(s, g \in V\). An algorithmic policy \(\pi_{\text{ml}}\) returns a walk from \(s\) to \(g\) that minimizes expected path length (or maximizes likelihood under a corpus-derived distribution). A human policy \(\pi_h\) returns a walk that minimizes a composite cost whose terms include not only remaining graph distance but also local readability, semantic priming, positional salience of links, and the agent’s own history of successful and unsuccessful forays.
@@ -131,6 +133,8 @@ The remainder of the dissertation develops the formal apparatus, the data pipeli
 \section{Visual Metaphor: The Map and the Compass}
 
 A cartographer’s map is an externalized, static representation optimized for a single objective: accurate reconstruction of spatial relations. A compass, by contrast, is a local instrument whose reading is meaningful only in relation to the body that holds it and the immediate terrain. Machine-learning systems trained on static corpora or random walks are cartographers; they produce excellent global maps. Human navigators, moment by moment, are compass users; they integrate local signal with an internal, continually updated model of “where I am trying to go.” The two instruments are complementary, yet modern pipelines have overwhelmingly invested in cartography.
+
+Imagine navigating the forest not on a clear day, but in a dense fog. The algorithmic cartographer possesses a satellite array that pierces the fog, seeing the entire graph \(G=(V,E)\) simultaneously. The human navigator, however, holds only a lantern that illuminates a radius of a few feet—the hyperlinks currently visible on their screen. ``Information scent'' acts as a faint auditory cue or a familiar silhouette cutting through this fog. The human does not move toward the ultimate coordinates, which they cannot see; they move toward the strongest local scent, stepping from the illumination of one lantern-light into the next.
 
 \section{Graph Navigation as a Decision Problem}
 
@@ -246,6 +250,8 @@ A single completed path
 
 When thousands of such sessions are aggregated, the resulting dataset contains not merely successful paths but the full local decision context that produced them. This is precisely the signal required to train a goal-conditioned policy \(\pi_h(a' \mid a, g)\) whose geometry reflects human heuristics (lead-section bias, hub exploitation, semantic priming, satisficing under time pressure) rather than pure graph distance or corpus co-occurrence.
 
+Visually, we can imagine the WOW trajectory as drawing a constellation in a night sky of thousands of dim stars. When the player stands on the \textit{Basketball at the Summer Olympics} node, dozens of potential out-links (stars) are visible. When the human selects \textit{Cold War}, that specific edge ignites into a glowing filament, while the rejected links—\textit{1992 Summer Olympics} or \textit{Olympic medal table}—remain dim. The WOW apparatus captures this exact visual state. Our dataset is not just a collection of glowing filaments; it is a meticulous record of every dim star that was ignored. This negative space is precisely what teaches the model the shape of human preference.
+
 The same infrastructure that runs the live game can, in the backend, replay every reported trajectory against the Wikipedia Parse API to confirm each edge existed at decision time and to extract the precise set of alternatives that were visible. The resulting structured tuples become the direct input to the behavioral-cloning objective described in Chapter 4.
 
 This single illustrative trajectory therefore demonstrates both the expressive power of the WOW elicitation layer and the direct route from raw human navigation to high-quality, goal-conditioned training data for human-aligned embeddings and policies.
@@ -305,6 +311,8 @@ In the space \(\phi_h\), the effective distance \(d_h(a, g) = \|\phi_h(a) - \phi
 
 Moreover, certain directions in \(\phi_h\) are predicted to align with interpretable human heuristics (hub-seeking, lead-section preference, lexical priming), offering post-hoc explanations that standard embeddings lack.
 
+Standard text embeddings treat the semantic space as a flat, uniform vacuum where distance is dictated purely by co-occurrence. By reverse-engineering the tracks in the snow, our human-aligned embedding \(\phi_h\) warps this flat space into a topography of gravity wells. High-degree hubs like \textit{Cold War} or \textit{United States} become massive gravitational attractors. In this warped geometry, a human path doesn't travel in a straight Euclidean line; it naturally rolls down the slopes of these cognitive hubs, utilizing their gravitational momentum to slingshot toward the target. The algorithm learns to warp the space exactly as human cognition warps it.
+
 \section{Validation Protocol}
 
 Hold out 20 \% of trajectories. For each held-out \((s, g)\), compare three agents:
@@ -333,7 +341,7 @@ Let \(\Pi\) be the space of all stationary policies on \(G\). Define two scalar 
 \mathcal{L}_{\text{human}}(\pi) &= \mathbb{E}_{g \sim \mathcal{G}} \Bigl[ \mathbb{E}_{\tau \sim \pi(\cdot \mid s,g)} \bigl[ C_h(\tau, g) \bigr] \Bigr]
 \end{align}
 
-where \(\mathcal{G}\ ) is a distribution over goals (in WOW, uniform over category pairs) and \(C_h\) is the human path cost defined earlier.
+where \(\mathcal{G}\) is a distribution over goals (in WOW, uniform over category pairs) and \(C_h\) is the human path cost defined earlier.
 
 \begin{conjecture}[Strict Separation]
 For the Wikipedia link graph and for any \(\varepsilon > 0\) there exists a policy \(\pi_h^*\) (recovered by behavioral cloning on sufficiently many WOW trajectories) such that
@@ -373,6 +381,8 @@ If Conjecture 5.1 holds, then any system whose users are humans—chat assistant
 \section{Metaphor: The Prosthetic that Learns the Body’s Gait}
 
 A prosthetic limb that minimizes energy expenditure according to a biomechanical model is an engineering triumph. Yet if its control policy does not also reproduce the micro-adjustments, hesitations, and slight asymmetries that characterize the wearer’s natural gait, the user will reject it. The most advanced hardware fails when it optimizes the wrong objective. Human-aligned embeddings are the software equivalent: they do not merely compute the shortest route through knowledge; they walk the route in a way that feels like an extension of the user’s own mind.
+
+Modern interactive knowledge systems act as cognitive exoskeletons. If an exoskeleton calculates the absolute shortest trajectory to lift an object but ignores the natural articulation of the human shoulder, it will fight the wearer, causing friction and eventual abandonment. Similarly, when an AI assistant forces a user down the algorithmic highway—presenting a mathematically optimal but semantically jarring sequence of documents—it fights the user's natural cognitive gait. Human-aligned embeddings \(\phi_h\) ensure the exoskeleton moves in sync with the foraging mind, transforming abrupt computational leaps into fluid, intuitive strides. The technology becomes invisible, not because it is perfectly efficient, but because it feels perfectly human.
 
 \section{From Data to Deployment}
 
