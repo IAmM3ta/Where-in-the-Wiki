@@ -1,13 +1,17 @@
 # Where in the Wiki
 
-**Wikipedia racing game with comprehensive path logging for human decision tree capture and ML training toward human-like navigation agents.**
+**Author:** Robert F. Thomas (publishing as Metta Thomas)
+
+**Status:** playable prototype + planned pilot. This repository does not report a collected path dataset, a trained embedding phi_h, a trained policy pi_h, or any win rate, KL, or recovery metric. Do not treat the long-form TeX as a completed dissertation.
+
+Wikipedia racing prototype with client-side path logging, aimed at a future study of human decision traces on the live English Wikipedia link graph.
 
 ## Core Game Rules
 
 - Players select a subject category (General, Science, History, Sports, Technology, Business).
-- Both players receive the **same** random starting Wikipedia article and the **same** random target article drawn from that category's curated pool.
-- Race to navigate from Start → Target **exclusively by clicking hyperlinks** present in the article body text. No search bar, no browser back/forward, no external navigation.
-- **Scoring**: Winner determined by combined metric prioritizing **fewest clicks** (primary key) then **lowest elapsed time** (secondary). Reaching the target in fewer clicks beats being marginally faster on higher click counts.
+- The player receives a random starting Wikipedia article and a random target article drawn from that category's curated pool.
+- Race to navigate from Start → Target **exclusively by clicking hyperlinks** present in the article body text. No search bar, no browser back/forward as a game move, no external navigation.
+- **Scoring**: combined metric prioritizing **fewest clicks** (primary) then **lowest elapsed time** (secondary).
 
 ## Scoring Formula (Prototype)
 
@@ -15,116 +19,122 @@
 score = clicks * 10000 + Math.floor(timeMs / 1000)
 ```
 
-Clicks are weighted ~10,000× heavier than one second of time. This encodes the design priority: a path with 2 fewer clicks wins even if it took 30+ minutes longer. In full multiplayer the server applies identical weighting and declares the lowest-score player the winner.
+Clicks are weighted ~10,000× heavier than one second of time. A solo mode shows a simulated opponent for engagement only. That opponent is not a scientific control and its outcomes are not results.
 
-## Why Path Logging Matters
+## What logging is for
 
-This project exists to generate high-quality datasets of *real human goal-conditioned trajectories* on the Wikipedia link graph. Each session records:
+The project is designed to support later collection of goal-conditioned human trajectories. Each exported session can record:
 
-- Exact sequence of articles visited
-- Per-step timestamps (revealing deliberation time)
-- Cumulative click count at each decision point
-- Category, start, target, final metrics
+- Sequence of articles visited
+- Per-step timestamps
+- Cumulative click count
+- Category, start, target, score
+- `consentAcknowledged` (pre-play checkbox)
+- `contrastiveRejectedLinkLogging: "planned"` (not collected yet)
 
-These traces enable training of models that internalize human heuristics for multi-hop reasoning and semantic navigation:
-
-- Which links humans prefer (lead-section bias, hub articles, title length, embedding proximity to target)
-- How humans balance exploration vs. exploitation when the optimal shortest path is unknown
-- Failure modes and recovery strategies
-
-Future deep learning models (graph + sequential policies) trained on this data will exhibit more human-like, robust, and interpretable behavior when performing research, tool-use planning, or open-ended inference over large knowledge bases.
+These traces are a proposed training signal for models of human multi-hop navigation. No such model has been trained in this repository. Future work, after a consented pilot and edge validation, would ask which links humans prefer and how they trade exploration against progress. That question is open.
 
 ## Current Implementation: Single-File HTML Prototype
 
-`index.html` is a fully functional, zero-dependency (except Tailwind CDN + live Wikipedia Parse API) prototype.
+`index.html` is a playable, zero-backend prototype (Tailwind CDN + live Wikipedia Parse API).
 
 **Implemented:**
-- 6 category pools with high-signal, real Wikipedia titles
-- Dynamic random Start/Target pair selection per category
-- Live Wikipedia content via `action=parse` (cleaned: infoboxes/navboxes/references stripped for navigation focus; images lightly styled)
-- Strict link interception: only internal `/wiki/` main-namespace links advance the game
-- Real-time clicks counter + mm:ss timer
-- Complete path log (step, title, timeMs, clicks_at_step)
+
+- 6 category pools with real Wikipedia titles
+- Random Start/Target pair per category
+- Live Wikipedia content via `action=parse` (infoboxes, navboxes, and references stripped for navigation focus)
+- Link interception: internal `/wiki/` main-namespace links advance the game
+- Clicks counter and mm:ss timer
+- Path log (step, title, time, clicks)
 - Win detection on canonical title match
-- Results panel with score breakdown, path chain, simulated opponent for solo play feel
-- One-click JSON export (clipboard + file download) containing everything needed for dataset building
-- Mobile-responsive, dark, clean Tailwind UI
+- Results panel and one-click JSON export (clipboard + download)
+- Consent checkbox that gates Start. The notice states that paths may be stored for research and that no IRB approval is claimed
+- Mobile-responsive dark UI
 
-**Limitations (by design for v0.1):**
-- Hardcoded pools (no live category member sampling) → guarantees playable, relevant articles and avoids complex PetScan/random-in-category calls
-- No backend → paths logged client-side only; export for manual aggregation
-- No cross-player sync → solo prototype; same start/target logic will be server-enforced later
-- No path validation → client-trust for prototype (full version will replay or graph-check edges)
+**Not implemented (do not describe as done):**
 
-Open `index.html` in any modern browser. Internet required for Wikipedia content.
+- Contrastive dump of visible but unchosen links
+- Server-side edge validation
+- Multiplayer or shared lobbies
+- Any trained phi_h / pi_h
+- A public path dataset
 
-## Dissertation
+**Limitations of v0.1:**
 
-The complete dissertation "From Human Trails to Human-Aligned Embeddings: Gamified Elicitation of Decision Trees on Semantic Graphs" is included in the repository:
+- Hardcoded pools (no live category-member sampling)
+- Paths stay in the browser until the player exports them
+- Client-trust: hops are not replayed against the API before export
+- Self-selected play; no demographics
 
-- **LaTeX source**: `docs/WOW-Dissertation.tex`
+Open `index.html` in a modern browser. Internet is required for Wikipedia content. Acknowledge the consent notice before Start.
 
-It features a detailed worked example of navigating from the "Basketball" article to the "Moon landing" article. This illustrates the human decision process at each step (visible alternatives, heuristics like lead-section bias and hub exploitation, semantic priming), and shows how a single trajectory generates rich supervised training data (positive chosen links + contrastive rejected alternatives + temporal features) for training human-aligned goal-conditioned policies and embeddings.
+## Long-form draft
 
-The compiled PDF provides the full formatted academic presentation.
+`docs/WOW-Dissertation.tex` is a long-form technical draft (June 2026, claim-surgery revision October 2026), not a degree dissertation and not a results paper. An October 2026 revision note at the front states the status: systems proposal, prototype, and planned protocol.
 
-## Full System Vision & Roadmap
+- LaTeX source: `docs/WOW-Dissertation.tex`
+- Related work: `docs/RELATED-WORK.md` (Wikispeedia; West & Leskovec)
+- Pilot plan: `docs/PILOT-PROTOCOL.md` (targets only; no collected N)
+- `docs/WOW-Dissertation_RFT.pdf`, if present, is the pre-revision compile and is **stale until recompiled**
 
-### Phase 1 (Current)
-Prototype + local data export. Validate UX and logging fidelity.
+The Basketball → Moon landing walkthrough in the TeX is illustrative, not logged pilot data.
 
-### Phase 2 – Backend & Multiplayer
-- FastAPI (Python) or Node/Express
-- PostgreSQL for users, matches, trajectories (normalized tables: matches, steps, scores)
-- WebSocket (or Supabase Realtime) for live race lobbies: generate shared (start, target) via seeded RNG or shared entropy, broadcast progress if desired (or post-hoc reveal)
-- Auth (JWT or magic links) so paths are attributable yet privacy-respecting
-- On submission: server validates each hop had a real link (best-effort via cached adjacency or on-demand parse), computes authoritative score, stores full trace
-- REST endpoints: /matches, /submit-path, /leaderboard, /dataset-export (Parquet)
+## Roadmap (future; not done)
 
-### Phase 3 – Data & Modeling Pipeline
-- Article embeddings (bge-m3, wiki2vec, or fine-tuned)
-- Feature vectors per decision: current_article_emb, target_emb, history_summary (mean or LSTM), link_features (position_in_text, is_lead, out_degree, title_len, emb_sim_to_target)
-- Supervised dataset: (state, chosen_link, outcome) or full trajectories for sequence modeling
-- Model families:
-  - Transformer decoder conditioned on goal embedding + graph neighborhood
-  - GNN policy network over dynamically induced wiki subgraph
-  - Behavioral cloning + Inverse RL (recover latent reward: progress + human-likeness + efficiency)
-- Evaluation: human win-rate vs model, path length distribution match, recovery from dead-ends
+### Phase 1 (current)
 
-### Phase 4 – Advanced
-- Integration with user's broader stack (OPEV, AR-Chive, metta-thomas-publications, BookHunter) e.g. spatial AR wiki overlays or haptic feedback for path "goodness"
-- Public dataset release (with consent/anonymization) for broader research on human information foraging
-- Closed-loop: model proposes "interesting" start/target pairs that maximize learning signal (high branching, ambiguous semantics)
+Prototype, local export, consent gate. UX and logging fidelity only.
 
-## Repository Structure
+### Phase 2 – Backend and validation
+
+- Server that stores consented matches
+- Replay of each hop against the Parse API or a cached adjacency list
+- Authoritative score
+- Dataset export only after anonymization and consent
+
+### Phase 3 – Modeling (only after real traces)
+
+- Features per decision (position, degree, lexical overlap, time)
+- Behavioral cloning as a planned method, not a result
+- Baselines: shortest path, random click, random-walk embeddings
+- Report nulls if a model does not help
+
+### Phase 4 – Later
+
+- Optional public release of an anonymized set
+- Broader recruitment
+- No claim of community scale until that recruitment exists
+
+## Repository structure
 
 ```
 Where-in-the-Wiki/
-├── index.html          # Playable prototype + data exporter
+├── index.html
 ├── README.md
-├── docs/
-│   └── WOW-Dissertation.tex  # Full dissertation source (with Basketball → Moon landing example)
-└── (future) backend/   # FastAPI + DB migrations, websocket handlers
+└── docs/
+    ├── WOW-Dissertation.tex
+    ├── WOW-Dissertation_RFT.pdf   # stale until recompiled
+    ├── RELATED-WORK.md
+    └── PILOT-PROTOCOL.md
 ```
 
-## Getting Started (Prototype)
+## Getting started
 
 ```bash
 git clone https://github.com/IAmM3ta/Where-in-the-Wiki.git
-open index.html   # or serve via any static server
+# open index.html, or serve the directory with any static server
 ```
 
-## Technical Notes
+## Technical notes
 
 - Wikipedia Parse API: `https://en.wikipedia.org/w/api.php?action=parse&...&origin=*`
-- CORS works in browser; rate limits generous for interactive use
-- Title normalization: spaces vs underscores handled; canonical titles from API used for win detection
-- Future graph validation will use adjacency lists or on-the-fly link extraction
+- Identify the client and respect Wikimedia rate limits before any automated crawl. Interactive play is the intended use.
+- Title normalization uses canonical titles from the API for win detection.
 
-## License & Philosophy
+## License and ethics
 
-Open for research/educational use. Strong emphasis on precise data provenance and consent for any ML training on exported human traces. Aligns with user's broader commitment to IP control and high-signal, low-slop knowledge artifacts.
+Open for research and educational use. Path logs are behavioral data. The prototype asks for acknowledgment before play and does not claim an IRB protocol. Separate opt-in for model training, anonymization, and a documented exemption or review are specified in `docs/PILOT-PROTOCOL.md` and are not yet completed.
 
 ---
 
-Built as cognitive infrastructure for modeling human-like reasoning in large semantic graphs. Each logged path is a window into how minds traverse knowledge under goal pressure.
+Built as a proposal for studying human navigation on a large semantic graph. A logged path is not, by itself, evidence that a human-aligned embedding exists.

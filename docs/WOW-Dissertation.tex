@@ -24,7 +24,7 @@
 \fancyhf{}
 \fancyhead[L]{\small\textit{Where in the Wiki: Human Paths in Semantic Graphs}}
 \fancyhead[R]{\small\thepage}
-\fancyfoot[C]{\footnotesize Draft --- June 2026}
+\fancyfoot[C]{\footnotesize Draft --- claim-surgery revision October 2026}
 \renewcommand{\headrulewidth}{0.4pt}
 
 \usepackage{titlesec}
@@ -55,11 +55,12 @@
 % =============================================
 \title{\vspace{-1cm}\textbf{From Human Trails to Human-Aligned Embeddings:\\Gamified Elicitation of Decision Trees on Semantic Graphs}\\[0.6cm]
 \large Distinguishing Algorithmic Efficiency from Human Navigation Heuristics\\[0.4cm]
-\normalsize A Conceptual Implementation via \textit{Where in the Wiki}}
-\author{Metta Thomas\\[0.2cm]
-\small Independent Researcher \& Builder\\[-0.1cm]
+\normalsize Systems Proposal and Prototype via \textit{Where in the Wiki}\\[0.3cm]
+\normalsize Toward a CHI Late-Breaking Work / Demo}
+\author{Robert F. Thomas (publishing as Metta Thomas)\\[0.2cm]
+\small Independent Researcher\\[-0.1cm]
 \small\texttt{https://github.com/IAmM3ta/Where-in-the-Wiki}}
-\date{June 2026}
+\date{June 2026; claim-surgery revision October 2026}
 
 \begin{document}
 
@@ -68,12 +69,17 @@
 \begin{abstract}
 \noindent\textbf{Abstract.} Modern optimization paradigms in machine learning and algorithmic design prioritize global efficiency metrics—shortest paths, minimal expected loss, maximal reconstruction fidelity—that treat the underlying graph or corpus as a static, fully observable substrate. These objectives produce systems that excel on benchmark leaderboards yet frequently diverge from the strategies living humans employ when navigating uncertain, partially observable semantic environments under cognitive and temporal constraints.  
 
-This dissertation advances the conjecture that the \textit{most efficient path} (in the graph-theoretic or corpus-statistical sense) is not identical to the \textit{most human path}, and that the measurable divergence between them constitutes an actionable signal for building more intuitive, robust, and human-aligned technologies. We operationalize the conjecture through a gamified data-collection apparatus called \textit{Where in the Wiki} (WOW). In WOW, human participants compete to navigate between randomly paired start and target articles within a chosen knowledge category, moving exclusively by clicking hyperlinks in the article body. The scoring rule is lexicographic: fewest clicks first, then shortest elapsed time. Every completed race exports a structured trace containing the ordered sequence of visited articles, per-decision timestamps, and final scalar score.  
+This systems proposal advances the conjecture that the \textit{most efficient path} (in the graph-theoretic or corpus-statistical sense) is not identical to the \textit{most human path}, and that the measurable divergence between them constitutes an actionable signal for building more intuitive, robust, and human-aligned technologies. We operationalize the conjecture through a gamified data-collection apparatus called \textit{Where in the Wiki} (WOW). In WOW, human participants compete to navigate between randomly paired start and target articles within a chosen knowledge category, moving exclusively by clicking hyperlinks in the article body. The scoring rule is lexicographic: fewest clicks first, then shortest elapsed time. Every completed race can export a structured trace containing the ordered sequence of visited articles, per-decision timestamps, and final scalar score.  
 
-These traces are not mere logs; they are high-resolution demonstrations of a human policy \(\pi_h(a'\mid a,g)\) operating on the live Wikipedia link graph. By aggregating thousands of such demonstrations we reverse-engineer a specialized embedding space \(\phi_h\) whose geometry and induced transition probabilities more faithfully reproduce human choice distributions than embeddings trained on co-occurrence statistics or topological random walks. The resulting human-aligned representations are conjectured to improve sample efficiency, recovery from dead-ends, and transfer performance in downstream tasks that share the structure of goal-conditioned navigation under bounded resources—precisely the tasks that dominate real-world deployment of retrieval-augmented agents, multi-hop reasoners, and interactive knowledge systems.  
+These traces are designed as demonstrations of a human policy \(\pi_h(a'\mid a,g)\) on the live Wikipedia link graph. By collecting such demonstrations at pilot scale and, later, at larger scale, we aim to learn a specialized embedding \(\phi_h\) hypothesized to reproduce human choice distributions better than embeddings trained on co-occurrence statistics or topological random walks. \textbf{No trained \(\phi_h\) or \(\pi_h\) is reported in this draft.} If obtained, the resulting human-aligned representations are conjectured to improve sample efficiency, recovery from dead-ends, and transfer performance in downstream tasks that share the structure of goal-conditioned navigation under bounded resources—precisely the tasks that dominate real-world deployment of retrieval-augmented agents, multi-hop reasoners, and interactive knowledge systems.  
 
-The work bridges two communities. For the general reader it offers a visual metaphor: the difference between an engineered highway that minimizes asphalt and the network of deer trails that minimizes total effort for a foraging mind. For the expert it supplies formal definitions, a precise data schema, a behavioral-cloning objective, and a falsifiable conjecture relating human regret to embedding distortion. The prototype implementation is released as open-source single-file HTML at \texttt{https://github.com/IAmM3ta/Where-in-the-Wiki}, enabling immediate community-scale data collection and iterative refinement of the human-derived embedding pipeline.
+The work bridges two communities. For the general reader it offers a visual metaphor: the difference between an engineered highway that minimizes asphalt and the network of deer trails that minimizes total effort for a foraging mind. For the expert it supplies formal definitions, a precise data schema, a behavioral-cloning objective, and a falsifiable conjecture relating human regret to embedding distortion. A playable prototype is released as open-source single-file HTML at \texttt{https://github.com/IAmM3ta/Where-in-the-Wiki}, enabling pilot data collection. Embedding refinement is future work after validated traces.
 \end{abstract}
+
+\begin{quote}
+\noindent\textbf{Revision note (October 2026).}
+This manuscript is a long-form technical draft: a \textbf{systems proposal}, a \textbf{playable prototype}, and a \textbf{planned pilot protocol}. It is not a completed dissertation and it reports no empirical results. Claim surgery demotes anticipatory results language (no collected ``thousands of paths''; no finished \(\phi_h\) or \(\pi_h\)). Conjectures 1.1, 4.1, and 5.1 remain and are labeled \textbf{untested}. The Basketball \(\to\) Moon landing walkthrough is \textbf{illustrative}, not logged pilot data. A short related-work subsection in Chapter~1 distinguishes Wikispeedia (West, Pineau, and Precup, IJCAI 2009) and West and Leskovec (WWW 2012). The compiled PDF in this repository, if present, is stale until the TeX is recompiled. No path counts, win rates, KL scores, or embedding metrics were added in this revision.
+\end{quote}
 
 \tableofcontents
 \newpage
@@ -89,7 +95,7 @@ Imagine a vast, living forest whose every tree is a discrete packet of knowledge
 
 Now descend to the forest floor. Here the same terrain is experienced by countless foragers—deer, foxes, humans—who cannot see the global map. They move by local scent, memory of past journeys, the pull of familiar clearings, and the avoidance of remembered thickets. Over generations their repeated passages wear faint but resilient trails. These trails do not coincide with the engineer’s highway. They curve toward berry patches that are not on the shortest route, they lengthen to pass a reliable spring, and they sometimes avoid a direct but exposed ridge because the cognitive or energetic cost of that ridge is higher for a living body than the extra distance around it. The network of deer trails is not optimal by the engineer’s metric, yet it is exquisitely adapted to the actual decision-making architecture of the creatures who use it.
 
-The central conjecture of this dissertation is that these two networks—the engineered highway and the worn deer trails—represent genuinely distinct solutions to the same navigation problem, and that modern machine-learning systems, trained overwhelmingly on highway-style objectives, systematically underperform on tasks whose success ultimately depends on alignment with deer-trail cognition.
+The central conjecture of this work is that these two networks—the engineered highway and the worn deer trails—represent genuinely distinct solutions to the same navigation problem, and that modern machine-learning systems, trained overwhelmingly on highway-style objectives, systematically underperform on tasks whose success ultimately depends on alignment with deer-trail cognition.
 
 To the optimization engineer, the mountain ridge is merely a calculation of elevation and distance, quickly solved by a tunnel or a straight paved grade. But to the living forager, the ridge possesses *friction*—the biting wind, the physical exposure, and the cognitive load of a steep climb. The algorithm bulldozes the terrain; the human negotiates with it. When we observe a human clicking through a Wikipedia article, we are watching this negotiation in real-time. A mathematically short link buried in a dense, unreadable paragraph carries high ``cognitive friction,'' prompting the human to instead take a longer, but smoother, path through a well-structured hub page.
 
@@ -115,15 +121,24 @@ There exist families of graphs \(G\) (including the Wikipedia link graph) and di
 and, moreover, the policy that minimizes the human cost yields strictly lower \textit{human-experienced regret} when deployed in interactive settings where the agent must recover from locally suboptimal choices under partial observability.
 \end{conjecture}
 
+\noindent\textbf{Status.} Conjecture~1.1 is \textbf{untested}. No WOW corpus has been aggregated and no embedding has been fit.
+
 The conjecture is not that humans are irrational; it is that the rationality they exhibit is \textit{ecological}—adapted to the information-processing architecture they actually possess—rather than \textit{asymptotic} with respect to an idealized observer who sees the entire graph at once.
 
 \section{Why the Distinction Matters Now}
 
 Contemporary civilization organizes its technological and economic systems around the premise that optimization, growth, and profit are commensurable and jointly sufficient proxies for welfare. In algorithmic terms this premise manifests as the belief that any system that minimizes a well-specified scalar loss on a large dataset will, as a byproduct, serve human ends. The premise fails precisely when the loss function omits dimensions of human experience that are difficult to quantify yet decisive for adoption, trust, and long-term utility—dimensions such as cognitive fit, narrative coherence, and the feeling of “this next step makes sense to me.”
 
-Gamification offers a practical instrument for rendering those omitted dimensions legible. By converting an intrinsically motivating competitive task (race to the target article) into a high-volume data-collection protocol, we obtain thousands of human decision trees whose statistical structure can be reverse-engineered into embeddings, policies, and interfaces that feel \textit{natural} rather than merely correct. The WOW prototype already demonstrates that non-expert participants, when placed in a competitive yet low-stakes environment, produce trajectories that are neither shortest-path nor random; they are recognizably human. Aggregating those trajectories at scale supplies the missing training distribution for a new generation of human-aligned models.
+Gamification offers a practical instrument for rendering those omitted dimensions legible. By converting an intrinsically motivating competitive task (race to the target article) into a data-collection protocol, we seek to obtain human decision traces whose structure can later support reverse-engineering of embeddings, policies, and interfaces that feel \textit{natural} rather than merely correct. The WOW prototype supports competitive navigation and client-side logging. Whether aggregate trajectories systematically differ from shortest-path or random baselines in the predicted ways is an empirical question for the planned pilot; scale aggregation is not yet performed.
 
-The remainder of the dissertation develops the formal apparatus, the data pipeline, and the empirical program required to test Conjecture 1.1 at the scale the conjecture itself demands.
+The remainder of this report develops the formal apparatus, the data pipeline, and the empirical program required to test Conjecture 1.1 at the scale the conjecture itself demands.
+
+\section{Related Work: Wikispeedia and Human Wayfinding}
+\label{sec:related-work}
+
+Goal-directed Wikipedia racing is prior art. \textbf{Wikispeedia} (West, Pineau, and Precup, IJCAI 2009) is an online game on a reduced Wikipedia graph: players navigate from a start article to a target by clicking links, and the resulting paths were used to infer semantic distances. That paper already states the anatomical point this draft must not rediscover: computers solve shortest paths, while humans use common-sense associations, often zooming out to hubs and then homing in. \textbf{West and Leskovec (WWW 2012)} analyze more than 30{,}000 goal-directed Wikispeedia paths and find that human wayfinding is efficient but characteristically different from shortest paths---early steps favor high-degree hubs; later steps follow content features---and that an intended target can be predicted from early clicks. The public SNAP Wikispeedia release (on the order of 4{,}600 articles and tens of thousands of finished paths) is the standard baseline corpus. Casual Wiki Game / Wikiracing play is the folk genre those studies formalized for research.
+
+WOW does not claim to discover that human trails differ from shortest paths. The honest delta is a \textit{research apparatus}: live English Wikipedia via the Parse API (not a frozen subgraph), category-controlled pairs, per-step timestamps, and a clicks-primary lexicographic score, aimed at behavioral cloning of decision traces for a human-aligned embedding \(\phi_h\) and policy \(\pi_h\). Those learning steps are \textbf{planned, not completed}. Contrastive logging of visible but rejected links is designed and not yet implemented. A minimal pilot target is at least 100--500 finished paths; the larger scale \(N \approx 5\times 10^{3}\)--\(10^{4}\) remains a later full-test target, not a collected sample. See also \texttt{docs/RELATED-WORK.md}.
 
 % =============================================
 % CHAPTER 2
@@ -182,11 +197,11 @@ Picture a sudden summer storm over the forest. All foragers are given the same t
     \end{itemize}
 \end{enumerate}
 
-The prototype (single-file HTML + Tailwind, live Wikipedia Parse API) already implements the full pipeline and exports exactly the schema above. Because the underlying graph remains the live Wikipedia, the elicited trajectories reflect contemporary link structure and article quality rather than a frozen snapshot.
+The prototype (single-file HTML + Tailwind, live Wikipedia Parse API) implements category pools, live article rendering, link interception, scoring, and JSON export of the path schema above. It does not implement server-side validation, contrastive rejected-link logging, or any trained embedding. Because the underlying graph remains the live Wikipedia, trajectories elicited later would reflect contemporary link structure rather than a frozen snapshot.
 
 \section{Concrete Illustration: From ``Basketball'' to ``Moon landing''}
 
-To make the abstract mechanics tangible, consider a single, fully worked navigation task that could arise in a WOW session. The starting article is \textit{Basketball}; the target article is \textit{Moon landing}. Both are real, high-quality Wikipedia pages. The task requires a human player to discover a path through the live hyperlink graph using only links visible in the body text of each successive article. This example simultaneously demonstrates (a) the kind of multi-hop semantic leap humans routinely perform, (b) the local decision process at each branching point, and (c) how one such trajectory, together with the alternatives that were \textit{not} chosen, becomes rich supervised training data for a human-aligned policy.
+To make the abstract mechanics tangible, consider a single, fully worked navigation task that could arise in a WOW session. \textbf{This walkthrough is illustrative and hypothetical; it is not logged pilot data.} The starting article is \textit{Basketball}; the target article is \textit{Moon landing}. Both are real, high-quality Wikipedia pages. The task requires a human player to discover a path through the live hyperlink graph using only links visible in the body text of each successive article. This example is pedagogical. It illustrates (a) the kind of multi-hop semantic leap humans routinely perform, (b) the local decision process at each branching point, and (c) how one such trajectory, together with alternatives that were \textit{not} chosen, could become supervised training data if those alternatives are logged. Rejected-link logging is planned, not implemented.
 
 \subsection{Starting Page and Initial Decision Horizon}
 
@@ -248,11 +263,11 @@ A single completed path
     \item Temporal features: longer \(\Delta t\) at early hops (higher uncertainty) versus near-zero at the final ``Space Race'' hop (high certainty).
 \end{enumerate}
 
-When thousands of such sessions are aggregated, the resulting dataset contains not merely successful paths but the full local decision context that produced them. This is precisely the signal required to train a goal-conditioned policy \(\pi_h(a' \mid a, g)\) whose geometry reflects human heuristics (lead-section bias, hub exploitation, semantic priming, satisficing under time pressure) rather than pure graph distance or corpus co-occurrence.
+When sessions are aggregated (pilot target at least 100--500 finished paths; larger \(N\) later), the dataset would contain not merely successful paths but the full local decision context that produced them. This is the signal we propose to use to train a goal-conditioned policy \(\pi_h(a' \mid a, g)\) whose geometry would reflect human heuristics (lead-section bias, hub exploitation, semantic priming, satisficing under time pressure) rather than pure graph distance or corpus co-occurrence. No such aggregation has been performed.
 
-Visually, we can imagine the WOW trajectory as drawing a constellation in a night sky of thousands of dim stars. When the player stands on the \textit{Basketball at the Summer Olympics} node, dozens of potential out-links (stars) are visible. When the human selects \textit{Cold War}, that specific edge ignites into a glowing filament, while the rejected links—\textit{1992 Summer Olympics} or \textit{Olympic medal table}—remain dim. The WOW apparatus captures this exact visual state. Our dataset is not just a collection of glowing filaments; it is a meticulous record of every dim star that was ignored. This negative space is precisely what teaches the model the shape of human preference.
+Visually, we can imagine the WOW trajectory as drawing a constellation in a night sky of thousands of dim stars. When the player stands on the \textit{Basketball at the Summer Olympics} node, dozens of potential out-links (stars) are visible. When the human selects \textit{Cold War}, that specific edge ignites into a glowing filament, while the rejected links—\textit{1992 Summer Olympics} or \textit{Olympic medal table}—remain dim. The apparatus is designed to capture this visual state once rejected links are logged. That contrastive record is planned, not collected, and no model has been taught from it.
 
-The same infrastructure that runs the live game can, in the backend, replay every reported trajectory against the Wikipedia Parse API to confirm each edge existed at decision time and to extract the precise set of alternatives that were visible. The resulting structured tuples become the direct input to the behavioral-cloning objective described in Chapter 4.
+The same infrastructure that runs the live game could, in a backend, replay every reported trajectory against the Wikipedia Parse API to confirm each edge existed at decision time and to extract the precise set of alternatives that were visible. That replay is \textbf{not yet implemented}; it is planned for a later phase. The resulting structured tuples would become the input to the behavioral-cloning objective described in Chapter 4.
 
 This single illustrative trajectory therefore demonstrates both the expressive power of the WOW elicitation layer and the direct route from raw human navigation to high-quality, goal-conditioned training data for human-aligned embeddings and policies.
 
@@ -262,7 +277,7 @@ Competitive scoring supplies extrinsic motivation that increases both volume and
 
 \section{Limitations Acknowledged}
 
-The prototype is client-side; path validation is trust-based. Future backend (FastAPI + PostgreSQL) will replay each reported transition against the live parse to confirm the edge existed at decision time. Participant pool is self-selected; demographic and expertise covariates are not yet captured. These are engineering, not conceptual, limitations; the data schema and elicitation logic already suffice to test the core conjecture at pilot scale.
+The prototype is client-side; path validation is trust-based. Future backend (FastAPI + PostgreSQL) will replay each reported transition against the live parse to confirm the edge existed at decision time. Participant pool is self-selected; demographic and expertise covariates are not yet captured. These are engineering, not conceptual, limitations. The data schema and elicitation logic are intended to support a pilot test; validation and \(N\) remain outstanding.
 
 % =============================================
 % CHAPTER 4
@@ -271,7 +286,7 @@ The prototype is client-side; path validation is trust-based. Future backend (Fa
 
 \section{Metaphor: Reading the Deer Tracks in Snow}
 
-After the storm, the snow holds the precise sequence of every hoof-fall. A skilled tracker does not merely count the number of prints; she reconstructs the \textit{policy} that generated them—where the animal paused to sniff, which faint cross-trails it ignored, which strong scent it followed even though it lengthened the journey. Our task is analogous: given thousands of timestamped human trajectories, recover the implicit utility function and the embedding geometry that together constitute the human navigation policy.
+After the storm, the snow holds the precise sequence of every hoof-fall. A skilled tracker does not merely count the number of prints; she reconstructs the \textit{policy} that generated them—where the animal paused to sniff, which faint cross-trails it ignored, which strong scent it followed even though it lengthened the journey. Our task is analogous: given a sufficient set of timestamped human trajectories (to be collected), we propose to recover the implicit utility function and the embedding geometry that together would constitute the human navigation policy. No such recovery is reported here.
 
 \section{Data Schema and Preprocessing}
 
@@ -303,19 +318,23 @@ Crucially, the loss is taken only over human-chosen successors, not over all pos
 
 \section{From Policy to Specialized Embedding Geometry}
 
-After convergence, the embedding \(\phi_h\) can be interrogated geometrically. We conjecture that:
+After training on validated pilot or later-scale data, the embedding \(\phi_h\) would be interrogated geometrically. We conjecture---and have not tested---that:
 
 \begin{conjecture}[Human Geometry]
 In the space \(\phi_h\), the effective distance \(d_h(a, g) = \|\phi_h(a) - \phi_h(g)\|_2\) (or a learned Mahalanobis variant) correlates more strongly with human-experienced path cost \(C_h\) than either graph distance or Euclidean distance in a reconstruction-optimized embedding of equal dimension.
 \end{conjecture}
 
+\noindent\textbf{Untested pending data.} Conjecture~4.1 is a hypothesis, not a result.
+
 Moreover, certain directions in \(\phi_h\) are predicted to align with interpretable human heuristics (hub-seeking, lead-section preference, lexical priming), offering post-hoc explanations that standard embeddings lack.
 
-Standard text embeddings treat the semantic space as a flat, uniform vacuum where distance is dictated purely by co-occurrence. By reverse-engineering the tracks in the snow, our human-aligned embedding \(\phi_h\) warps this flat space into a topography of gravity wells. High-degree hubs like \textit{Cold War} or \textit{United States} become massive gravitational attractors. In this warped geometry, a human path doesn't travel in a straight Euclidean line; it naturally rolls down the slopes of these cognitive hubs, utilizing their gravitational momentum to slingshot toward the target. The algorithm learns to warp the space exactly as human cognition warps it.
+Standard text embeddings treat the semantic space as a flat, uniform vacuum where distance is dictated purely by co-occurrence. If a human-aligned embedding \(\phi_h\) were later trained on validated traces, one conjecture is that it would warp this flat space into a topography of gravity wells. High-degree hubs like \textit{Cold War} or \textit{United States} become massive gravitational attractors. In this warped geometry, a human path doesn't travel in a straight Euclidean line; it naturally rolls down the slopes of these cognitive hubs, utilizing their gravitational momentum to slingshot toward the target. The algorithm learns to warp the space exactly as human cognition warps it.
 
-\section{Validation Protocol}
+\section{Planned Validation Protocol}
 
-Hold out 20 \% of trajectories. For each held-out \((s, g)\), compare three agents:
+The following comparison is a \textbf{planned} protocol. No results table is reported.
+
+Hold out 20 \% of trajectories (once a validated set exists). For each held-out \((s, g)\), compare three agents:
 \begin{enumerate}
     \item Shortest-path oracle (upper bound on clicks)
     \item Policy trained on corpus statistics or random walks
@@ -344,7 +363,7 @@ Let \(\Pi\) be the space of all stationary policies on \(G\). Define two scalar 
 where \(\mathcal{G}\) is a distribution over goals (in WOW, uniform over category pairs) and \(C_h\) is the human path cost defined earlier.
 
 \begin{conjecture}[Strict Separation]
-For the Wikipedia link graph and for any \(\varepsilon > 0\) there exists a policy \(\pi_h^*\) (recovered by behavioral cloning on sufficiently many WOW trajectories) such that
+For the Wikipedia link graph and for any \(\varepsilon > 0\) there exists a policy \(\pi_h^*\) (to be recovered, if possible, by behavioral cloning on sufficient WOW trajectories) such that
 \[
 \mathcal{L}_{\text{human}}(\pi_h^*) < \mathcal{L}_{\text{human}}(\pi_{\text{eff}}^*) - \varepsilon
 \]
@@ -355,7 +374,7 @@ while
 where \(\pi_{\text{eff}}^*\) is any policy that approximately minimizes effective length (shortest-path, A*, or a well-trained GNN planner). In other words, the human optimum lies strictly off the efficient frontier defined by length alone.
 \end{conjecture}
 
-The conjecture is falsifiable: if, after collecting \(N\) trajectories (pilot estimate \(N \approx 5 \times 10^3\)--\(10^4\)), the cloned policy fails to outperform length-minimizing baselines on held-out human cost while matching or exceeding them on length, the separation claim is weakened for this graph class.
+The conjecture is falsifiable and \textbf{untested}. A minimal pilot (target at least 100--500 finished paths) is for descriptives and, only if \(N\) and edge validation allow, a weak baseline. The figure \(N \approx 5 \times 10^3\)--\(10^4\) is a \textit{later full-test target}, not a collected sample and not the bar for a short demo paper. If, after a validated collection at that full-test scale, the cloned policy fails to outperform length-minimizing baselines on held-out human cost while matching or exceeding them on length, the separation claim is weakened for this graph class.
 
 \section{Why the Separation Arises}
 
@@ -386,20 +405,20 @@ Modern interactive knowledge systems act as cognitive exoskeletons. If an exoske
 
 \section{From Data to Deployment}
 
-The pipeline is deliberately modular:
+The pipeline is deliberately modular. It is a design, not a deployment:
 
 \begin{enumerate}
-    \item WOW collects raw trajectories at community scale.
-    \item Behavioral cloning produces \(\phi_h\) and \(\pi_h\).
-    \item \(\phi_h\) can be frozen and injected into any downstream architecture (RAG retriever, multi-hop reasoner, educational tutor) as a prior or as a fine-tuning objective.
-    \item Continuous collection (new categories, new participants, A/B tests of scoring rules) allows the embedding to track cultural and linguistic drift.
+    \item WOW is designed to collect raw trajectories (pilot first; community scale only if recruitment and consent support it).
+    \item Behavioral cloning would produce \(\phi_h\) and \(\pi_h\).
+    \item \(\phi_h\) could then be frozen and injected into a downstream architecture (RAG retriever, multi-hop reasoner, educational tutor) as a prior or as a fine-tuning objective.
+    \item Continued collection (new categories, new participants, A/B tests of scoring rules) could allow an embedding to track cultural and linguistic drift.
 \end{enumerate}
 
-Because the elicitation layer is itself a game, participation can be sustained indefinitely without paid crowdsourcing; the same interface that gathers data also educates players about the structure of knowledge and the nature of their own navigation heuristics.
+\textbf{None of steps 2--3 has been completed.} Because the elicitation layer is a game, one hypothesis is that participation could be sustained without paid crowdsourcing. That retention claim is not demonstrated.
 
 \section{Broader Civilizational Stake}
 
-The optimization paradigm that dominates contemporary technology and economics has produced extraordinary gains in measurable efficiency. It has also produced systems whose internal logic is increasingly opaque to the humans who must live with their outputs. By treating human decision traces as a first-class training signal rather than as noisy labels to be denoised, we open a route toward technologies whose optimization target is not merely “correct on the benchmark” but “comprehensible and usable by the minds that built the benchmark.” The deer-trail geometry is not a romantic alternative to the highway; it is the geometry that actually supports living movement. Recovering it at scale is a technical project whose success would narrow the widening gap between what our machines can compute and what our minds can inhabit.
+The optimization paradigm that dominates contemporary technology and economics has produced extraordinary gains in measurable efficiency. It has also produced systems whose internal logic is increasingly opaque to the humans who must live with their outputs. By treating human decision traces as a first-class training signal rather than as noisy labels to be denoised, we open a route toward technologies whose optimization target is not merely “correct on the benchmark” but “comprehensible and usable by the minds that built the benchmark.” The deer-trail geometry is offered as a hypothesis about the geometry that supports living movement, not as a recovered object. Whether it can be estimated from consented traces is an open technical question. For a conference-length argument, the stake is narrower: interfaces and agents whose next step is usable under partial observability, tested only after a real pilot.
 
 % =============================================
 % ANNOTATED BIBLIOGRAPHY
@@ -412,12 +431,12 @@ The optimization paradigm that dominates contemporary technology and economics h
 \bibitem{simon1956rational}
 Herbert A. Simon. 1956. Rational choice and the structure of the environment. \textit{Psychological Review} 63(2):129--138.
 
-\textit{Annotation.} The foundational statement of bounded rationality and satisficing. Simon argues that organisms do not optimize global utility functions; they select the first option that meets an aspiration level adapted to the structure of the environment they actually encounter. WOW trajectories are empirical realizations of satisficing policies on a large, real environment; the dissertation treats Simon’s framework as the normative justification for preferring human-derived embeddings over length-minimizing oracles.
+\textit{Annotation.} The foundational statement of bounded rationality and satisficing. Simon argues that organisms do not optimize global utility functions; they select the first option that meets an aspiration level adapted to the structure of the environment they actually encounter. WOW trajectories, once collected under the planned protocol, would be candidate realizations of satisficing policies. Simon’s framework is the normative reason this draft prefers human-derived embeddings over length-minimizing oracles; that preference is a conjecture, not a result.
 
 \bibitem{pirolli1999information}
 Peter Pirolli and Stuart Card. 1999. Information foraging. \textit{Psychological Review} 106(4):643--675.
 
-\textit{Annotation.} Develops an ecological model of human information seeking based on optimal foraging theory. Key constructs—“information scent,” patch leaving, between-patch navigation—map directly onto the link-evaluation and hub-jumping behavior observed in WOW sessions. The dissertation operationalizes scent as a recoverable feature in the behavioral-cloning objective.
+\textit{Annotation.} Develops an ecological model of human information seeking based on optimal foraging theory. Key constructs—“information scent,” patch leaving, between-patch navigation—map onto the link-evaluation and hub-jumping behavior the protocol is designed to elicit. Scent is treated as a feature the planned behavioral-cloning objective would try to recover. It has not been estimated from WOW data.
 
 \bibitem{russell2010artificial}
 Stuart Russell and Peter Norvig. 2010. \textit{Artificial Intelligence: A Modern Approach} (3rd ed.). Prentice Hall.
@@ -427,7 +446,7 @@ Stuart Russell and Peter Norvig. 2010. \textit{Artificial Intelligence: A Modern
 \bibitem{perozzi2014deepwalk}
 Bryan Perozzi, Rami Al-Rfou, and Steven Skiena. 2014. DeepWalk: Online learning of social representations. \textit{KDD}.
 
-\textit{Annotation.} Classic random-walk embedding method that optimizes for reconstruction of graph topology. Serves as the canonical example of a “highway” embedding; the dissertation predicts that human-cloned embeddings will outperform DeepWalk-style methods on human-likeness metrics while remaining competitive on length.
+\textit{Annotation.} Classic random-walk embedding method that optimizes for reconstruction of graph topology. Serves as the canonical example of a “highway” embedding; DeepWalk-style methods are a planned baseline family. This draft does not claim that any human-cloned embedding outperforms them.
 
 \bibitem{kipf2017semi}
 Thomas N. Kipf and Max Welling. 2017. Semi-supervised classification with graph convolutional networks. \textit{ICLR}.
@@ -454,10 +473,20 @@ Rishi Bommasani et al. 2021. On the opportunities and risks of foundation models
 
 \textit{Annotation.} Articulates the alignment problem for large models trained on internet-scale data. The dissertation contributes a concrete mechanism—gamified, goal-conditioned human trajectory collection—for injecting post-training behavioral data that reflects how humans actually navigate knowledge rather than how they statistically co-occur in text.
 
+\bibitem{west2009wikispeedia}
+Robert West, Joelle Pineau, and Doina Precup. 2009. Wikispeedia: An online game for inferring semantic distances between concepts. \textit{Proceedings of the 21st International Joint Conference on Artificial Intelligence (IJCAI)}.
+
+\textit{Annotation.} The direct predecessor game on a reduced Wikipedia graph. Paths infer asymmetric semantic relatedness and already exhibit hub-then-home-in navigation. WOW cites this work so that ``human trails differ from shortest paths'' is not presented as a new discovery.
+
+\bibitem{west2012wayfinding}
+Robert West and Jure Leskovec. 2012. Human wayfinding in information networks. \textit{Proceedings of the 21st International Conference on World Wide Web (WWW)}, pp.~619--628. ACM.
+
+\textit{Annotation.} Large-scale analysis of Wikispeedia paths (more than 30{,}000): efficient but not shortest-path; early hub use, later content features. Empirical predecessor of Conjecture~1.1. SNAP hosts the public path release (\texttt{https://snap.stanford.edu/data/wikispeedia.html}).
+
 \bibitem{shneiderman2020human}
 Ben Shneiderman. 2020. Human-centered artificial intelligence: Reliable, safe \& trustworthy. \textit{International Journal of Human–Computer Studies} 133:102--119.
 
-\textit{Annotation.} Argues that AI systems must be designed around human capabilities and limitations rather than around benchmark optimality. WOW is presented as an existence proof that competitive gamification can elicit the very behavioral data required to implement Shneiderman’s program at the level of internal representations (embeddings) rather than merely at the level of interface design.
+\textit{Annotation.} Argues that AI systems must be designed around human capabilities and limitations rather than around benchmark optimality. WOW is presented as a proposed apparatus, not empirical confirmation of Conjecture~5.1. Competitive gamification might elicit behavioral data relevant to Shneiderman’s program; no such dataset or trained embedding is reported here.
 
 \end{thebibliography}
 
