@@ -109,7 +109,7 @@
                 <span class="text-emerald-400">DATA FOR HUMAN-ALIGNED AI</span>
             </div>
             <h2 class="font-display text-4xl font-semibold tracking-tighter leading-none mb-3">Wikipedia racing.<br>Human decision traces.<br>Training data for minds that navigate like us.</h2>
-            <p class="text-zinc-400 text-[15px] max-w-md">A clean prototype for capturing how humans perform goal-directed search across one of the largest semantic graphs ever constructed. Every path logged is raw material for models that reason more like humans.</p>
+            <p class="text-zinc-400 text-[15px] max-w-md">A playable prototype for capturing how humans perform goal-directed search across Wikipedia. Paths are logged in the browser for export. No model has been trained, and no path counts are claimed.</p>
         </div>
 
         <!-- Category Selection -->
@@ -130,6 +130,15 @@
                 <!-- Populated by JS -->
             </div>
             
+            <div id="ethics-notice" class="mt-6 max-w-3xl border border-amber-700/50 bg-amber-950/30 rounded-2xl p-4 text-sm text-zinc-200">
+                <div class="text-[11px] tracking-wide text-amber-300/90 mb-2">CONSENT AND ETHICS — READ BEFORE PLAY</div>
+                <p class="text-[13px] leading-relaxed text-zinc-300">This prototype may keep a local log of the articles you visit, with timing and click counts, and the export button can copy that log as JSON. Paths may be stored for research on how people navigate Wikipedia if you export them or later share them with the researcher. This page does <strong>not</strong> claim IRB approval or an ethics exemption. Nothing is uploaded automatically. You can decline by not starting.</p>
+                <label class="mt-3 flex items-start gap-x-3 cursor-pointer">
+                    <input id="consent-checkbox" type="checkbox" onchange="updateStartGate()" class="mt-1 accent-amber-500">
+                    <span class="text-[13px] text-zinc-100">I agree that paths I play may be stored for research. I understand no IRB protocol is claimed.</span>
+                </label>
+            </div>
+
             <div class="mt-6 flex justify-center">
                 <button id="start-btn"
                         onclick="startGame()"
@@ -357,6 +366,11 @@
         let startTime = 0;
         let timerInterval = null;
         let pathLog = [];
+        // Contrastive rejected-link logging is planned (visible but unchosen links at each step).
+        // Not instrumented in this prototype: capturing the rejected set inside the click handler
+        // is easy to get wrong and is not required to keep the Parse API game working.
+        // JSON export records consentAcknowledged and contrastiveRejectedLinkLogging: "planned".
+        let consentAcknowledged = false;
         let isGameActive = false;
         let currentCategoryName = "";
 
@@ -616,8 +630,14 @@
                 }
             });
 
+            updateStartGate();
+        }
+
+        function updateStartGate() {
+            const box = document.getElementById('consent-checkbox');
+            consentAcknowledged = !!(box && box.checked);
             const startBtn = document.getElementById('start-btn');
-            if (startBtn) startBtn.disabled = false;
+            if (startBtn) startBtn.disabled = !(selectedCategory && consentAcknowledged);
         }
 
         function pickRandomCategory() {
@@ -645,6 +665,12 @@
         }
 
         async function startGame() {
+            const consentBox = document.getElementById('consent-checkbox');
+            consentAcknowledged = !!(consentBox && consentBox.checked);
+            if (!consentAcknowledged) {
+                alert('Please acknowledge that paths may be stored before starting. No IRB protocol is claimed.');
+                return;
+            }
             if (!selectedCategory) {
                 alert('Please select a category first');
                 return;
@@ -750,6 +776,9 @@
                 totalTimeMs: elapsed,
                 score: score,
                 path: pathLog,
+                                consentAcknowledged: true,
+                contrastiveRejectedLinkLogging: "planned",
+                loggingNote: "Contrastive rejected-link logging (visible but unchosen links) is planned and is not collected in this export.",
                 winner: score < opponentScore ? 'player' : (score > opponentScore ? 'opponent' : 'tie'),
                 opponentScore: opponentScore,
                 notes: "Prototype session. Full backend will include validated trajectories and user attribution."
@@ -782,6 +811,9 @@
                     totalTimeMs: elapsed,
                     score: calculateScore(clicks, elapsed),
                     path: pathLog,
+                    consentAcknowledged: !!consentAcknowledged,
+                    contrastiveRejectedLinkLogging: "planned",
+                    loggingNote: "Contrastive rejected-link logging (visible but unchosen links) is planned and is not collected in this export.",
                     winner: null,
                     notes: "Incomplete or aborted session from prototype."
                 };
@@ -828,7 +860,7 @@
             document.querySelectorAll('#category-buttons button').forEach(b => b.classList.remove('!bg-blue-600', '!border-blue-500', 'text-white'));
             selectedCategory = null;
             const startBtn = document.getElementById('start-btn');
-            if (startBtn) startBtn.disabled = true;
+            updateStartGate();
 
             // Clear any lingering state
             pathLog = [];
@@ -852,7 +884,7 @@
                     </div>
                     <div class="space-y-4 text-zinc-300 text-[13px] leading-relaxed">
                         <p>Every time you choose a link, you reveal a human heuristic: semantic similarity, positional bias (lead vs body), hub preference, or pragmatic "this feels closer to the goal" judgment.</p>
-                        <p>The exported JSON turns these micro-decisions into supervised training examples for goal-conditioned policies. A model trained on thousands of such traces learns to propose next steps that feel natural to humans while still progressing toward the target.</p>
+                        <p>The exported JSON is a trace that could later serve as supervised examples for goal-conditioned policies. No model has been trained on these paths, and this prototype does not claim a collected dataset.</p>
                         <p class="text-xs text-zinc-400 pt-2 border-t border-zinc-700">This is the difference between generic shortest-path algorithms and agents that navigate knowledge the way researchers, students, and curious minds actually do.</p>
                     </div>
                     <div class="mt-6 text-right">
